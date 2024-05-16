@@ -206,6 +206,9 @@ ggtree(tree_Myxococcota, layout="circular")  %<+%
   NEON_MAGs_metagenomes_chemistry + 
   geom_point2(mapping=aes(color=`Ecosystem Subtype`, size=`Total Number of Bases`))
 ```
+```{r}
+knitr::include_url("MyxoSankey.html")
+```
 
 ```{r}
 kable(
@@ -334,6 +337,10 @@ combined_df %>%
   left_join(NEON_MAGs, by = c("siteID" = "Site ID")) %>% 
    ggplot(aes(x = `siteID`, y = `elevation`)) +
   geom_point(aes(color=siteID))
+```
+
+```{r}
+knitr::include_url("BONASankey.html")
 ```
 
 # References
