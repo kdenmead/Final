@@ -1,0 +1,339 @@
+---
+title: "Final Project"
+author: "Kay Denmead, Leila Imani, Ethan Ni"
+date: "2024-05-17"
+output:
+  html_document:
+    toc: TRUE
+    code_folding: hide
+bibliography: myxo_ref.bib
+
+---
+
+# Introduction
+Humanity’s presence has had and will continue to have a profound impact on the Earth and the ecological processes that define it. Human emissions of greenhouse gasses are drastically impacting habitats around the globe, disrupting ecosystems and threatening biodiversity. Because of the incredible magnitude of change we are putting on the earth, it is important that we fully understand the effects of anthropogenic change on our ecosystems. Building this understanding is the first step towards taking action to protect the life around us. The National Ecological Observatory Network (NEON) program is an NSF-funded project that aims to quantify the changing ecological processes across the United States. NEON provides open data that characterize plants, animals, soil, nutrients, freshwater, and the atmosphere.
+
+Caribou Creek Watershed is a NEON field site located in central Alaska, northeast of Fairbanks. The site contains a variety of ecosystems, including shrublands, wetlands, hardwood forests, and scattered permafrost. Alaska as a whole is very affected by climate change, experiencing a temperature increase of 2.5 degrees C since 1948. The soils at this site are affected by a cycle of ice thawing and freezing. This results in a phenomenon called cryoturbation, which is when soil gets mixed by freezing and thawing ground ice.
+
+Myxococcta is a bacterial phylum which is notable for its "social lifestyle", a trait that is unusual in prokaryotes. These bacteria can thrive in many different environments including soil rich in organic matter, rotting wood, animal dung, and marine environments [@saggu_myxobacteria_2023]They have gliding motility and predatory behavior. They hunt in packs, using their gliding motility to swarm prey cells, feeding by secreting lytic enzymes [@waite_proposal_2020]. A recent study found that Myxococcota contains a photosynthesis gene cluster that encodes the enzymes necessary for bacteriochlorophyll biosynthesis, among other crucial enzymes. Phylogenetic analyses have indicated that this phylum has an ancient phototrophic history, playing a uniquely important role in ecosystems [@li_globally_2023]. They measure between 50-500 µm and can be seen with the naked eye [@shimkets_myxobacteria_2006]
+
+Despite being known for more than 100 years, myxobacteria have only been closely studied for the last few decades because they produce unique bioactive secondary metabolites. For this reason, these bacteria are being considered as an important source of natural products for drug discovery. For example, epothilones, isolated from Sorangium sp., are anti-tumor drugs that target microtubules and can be effective against taxol-resistant cancers [@mulzer_epothilones_2008]. Further exploring the diversity of this phylum can contribute to future research with biotechnology applications. 
+
+
+## Loading Libraries
+
+```{r}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("ggtreeExtra")
+BiocManager::install("ggtree")
+```
+
+```{r}
+library(tidyverse)
+library(knitr)
+library(DT)
+library(plotly)
+library(treeio)
+library(TDbook)
+library(ggimage)
+library(rphylopic)
+library(tidytree)
+library(ape)
+library(phytools)
+library(TreeTools)
+library(ggstar)
+library(ggnewscale)
+library(ggtreeExtra)
+library(ggtree)
+```
+
+```{r}
+tree_arc <- read.tree("data/NEON/gtdbtk.ar53.decorated.tree")
+tree_bac <- read.tree("data/NEON/gtdbtk.bac120.decorated.tree")
+```
+
+```{r}
+tree_bac_preorder <- Preorder(tree_bac)
+tree_Myxococcota <- Subtree(tree_bac_preorder, 2984)
+```
+
+## Loading in NEON data
+
+```{r}
+NEON_MAGs <- read_csv("data/NEON/GOLD_Study_ID_Gs0161344_NEON_edArchaea.csv") %>% 
+  select(-c(`GOLD Study ID`, `Bin Methods`, `Created By`, `Date Added`)) %>% 
+  mutate("Assembly Type" = case_when(`Genome Name` == "NEON combined assembly" ~ `Genome Name`, TRUE ~ "Individual")) %>% 
+  mutate_at("Assembly Type", str_replace, "NEON combined assembly", "Combined") %>% 
+  separate(`GTDB-Tk Taxonomy Lineage`, c("Domain", "Phylum", "Class", "Order", "Family", "Genus"), "; ", remove = FALSE) %>% 
+  mutate_at("Genome Name", str_replace, "Terrestrial soil microbial communities from ", "") %>% 
+  separate(`Genome Name`, c("Site","Sample Name"), " - ") %>% 
+  mutate_at("Sample Name", str_replace, "-comp-1", "") %>%
+  separate(`Sample Name`, c("Site ID","subplot.layer.date"), "_", remove = FALSE,) %>% 
+  separate(`subplot.layer.date`, c("Subplot", "Layer", "Date"), "-") 
+```
+
+```{r}
+NEON_metagenomes <- read_tsv("data/NEON/exported_img_data_Gs0161344_NEON.tsv") %>% 
+  rename(`Genome Name` = `Genome Name / Sample Name`) %>% 
+  filter(str_detect(`Genome Name`, 're-annotation', negate = T)) %>% 
+  filter(str_detect(`Genome Name`, 'WREF plot', negate = T))
+NEON_metagenomes <- NEON_metagenomes %>% 
+  mutate_at("Genome Name", str_replace, "Terrestrial soil microbial communities from ", "") %>% 
+  separate(`Genome Name`, c("Site","Sample Name"), " - ") %>% 
+  mutate_at("Sample Name", str_replace, "-comp-1", "") %>%
+  separate(`Sample Name`, c("Site ID","subplot.layer.date"), "_", remove = FALSE,) %>% 
+  separate(`subplot.layer.date`, c("Subplot", "Layer", "Date"), "-") 
+```
+
+```{r}
+NEON_chemistry <- read_tsv("data/NEON/neon_plot_soilChem1_metadata.tsv") %>% 
+  mutate_at("genomicsSampleID", str_replace, "-COMP", "")
+kable(NEON_chemistry_description <- read_tsv("data/NEON/neon_soilChem1_metadata_descriptions.tsv"))
+```
+
+## Creating Dataframes
+
+```{r}
+NEON_MAGs_metagenomes_chemistry <- NEON_MAGs %>% 
+  left_join(NEON_metagenomes, by = "Sample Name") %>% 
+  left_join(NEON_chemistry, by = c("Sample Name" = "genomicsSampleID"))
+```
+
+```{r}
+combined_df <- left_join(NEON_chemistry, NEON_metagenomes, by = c("siteID" = "Site ID"))
+```
+
+```{r}
+NEON_MAGs_ind <- NEON_MAGs %>% 
+  filter(`Assembly Type` == "Individual")
+```
+
+```{r}
+NEON_MAGs_co <- NEON_MAGs %>% 
+  filter(`Assembly Type` == "Combined") 
+```
+
+```{r}
+NEON_MAGs <- read_csv("data/NEON/GOLD_Study_ID_Gs0161344_NEON.csv")
+NEON_MAGs_Ind <- NEON_MAGs %>% 
+  filter(`Genome Name` != "NEON combined assembly") 
+NEON_MAGs_Ind_tax <- NEON_MAGs_Ind %>% 
+  separate(`GTDB-Tk Taxonomy Lineage`, c("Domain", "Phylum", "Class", "Order", "Family", "Genus"), "; ", remove = FALSE) 
+NEON_MAGs_Ind_tax_sample <- NEON_MAGs_Ind_tax %>% 
+  mutate_at("Genome Name", str_replace, "Terrestrial soil microbial communities from ", "") %>% 
+  separate(`Genome Name`, c("Site","Sample Name"), " - ") %>% 
+  mutate_at("Sample Name", str_replace, "-comp-1", "") %>%
+  separate(`Sample Name`, c("Site ID","subplot.layer.date"), "_", remove = FALSE,) %>% 
+  separate(`subplot.layer.date`, c("Subplot", "Layer", "Date"), "-",)
+```
+
+```{r}
+NEON_MAGs <- read_csv("data/NEON/GOLD_Study_ID_Gs0161344_NEON.csv") %>% 
+  select(-c(`GOLD Study ID`, `Bin Methods`, `Created By`, `Date Added`)) %>% 
+  mutate("Assembly Type" = case_when(`Genome Name` == "NEON combined assembly" ~ `Genome Name`, TRUE ~ "Individual")) %>% 
+  mutate_at("Assembly Type", str_replace, "NEON combined assembly", "Combined") %>% 
+  separate(`GTDB-Tk Taxonomy Lineage`, c("Domain", "Phylum", "Class", "Order", "Family", "Genus"), "; ", remove = FALSE) %>% 
+  mutate_at("Genome Name", str_replace, "Terrestrial soil microbial communities from ", "") %>% 
+  separate(`Genome Name`, c("Site","Sample Name"), " - ") %>% 
+  mutate_at("Sample Name", str_replace, "-comp-1", "") %>%
+  separate(`Sample Name`, c("Site ID","subplot.layer.date"), "_", remove = FALSE,) %>% 
+  separate(`subplot.layer.date`, c("Subplot", "Layer", "Date"), "-")
+NEON_MAGs_bact_ind <- NEON_MAGs %>% 
+  filter(Domain == "Bacteria") %>% 
+  filter(`Assembly Type` == "Individual") 
+```
+
+```{r}
+NEON_MAGs_Myxococcota <- NEON_MAGs_metagenomes_chemistry %>% 
+  filter(Phylum == "Myxococcota")
+```
+
+## Figures
+
+### General Information
+
+```{r}
+datatable(NEON_MAGs_Ind_tax %>% 
+    count(Phylum, sort = TRUE))
+```
+
+```{r}
+datatable(NEON_MAGs_Ind_tax_sample %>% 
+    count(Site, sort = TRUE))
+```
+
+```{r}
+datatable(NEON_MAGs_Ind_tax %>%
+  filter(str_detect(`Genome Name`, 'Caribou Creek')) %>% 
+  count(Phylum))
+```
+
+```{r}
+datatable(NEON_MAGs_Ind_tax %>%
+  filter(str_detect(`Phylum`, 'Myxococcota')) %>% 
+  count(`Genome Name`))
+```
+
+```{r}
+NEON_MAGs_bact_ind %>% 
+ggplot(aes(x = fct_rev(fct_infreq(Phylum)), fill = Site)) +
+  geom_bar() +
+  coord_flip()
+```
+
+
+### Myxococcota
+
+
+```{r}
+ggtree(tree_bac, layout="circular", branch.length="none") +
+    geom_hilight(node=2984, fill="steelblue", alpha=.6) +
+    geom_cladelab(node=2984, label="Myxococcota", align=TRUE,  
+                  offset = 0, textcolor='steelblue', barcolor='steelblue')
+```
+
+```{r}
+ggtree(tree_Myxococcota, layout="circular")  %<+%
+  NEON_MAGs_metagenomes_chemistry + 
+  geom_tiplab(size=2, hjust=-.1) +
+  xlim(0,20) +
+  geom_point(mapping=aes(color=Class)) 
+```
+
+```{r}
+ggtree(tree_Myxococcota, layout="circular")  %<+%
+  NEON_MAGs_metagenomes_chemistry + 
+  geom_point2(mapping=aes(color=`Ecosystem Subtype`, size=`Total Number of Bases`))
+```
+
+```{r}
+kable(
+  Myxococcota <- NEON_MAGs %>% 
+    filter(str_detect(`Phylum`, 'Myxococcota')))
+```
+
+```{r}
+Myxococcota %>% 
+  ggplot(aes(x = fct_infreq(Order))) +
+  geom_bar(aes(fill=Order)) +
+  coord_flip()
+```
+
+```{r}
+datatable(NEON_MAGs_Ind_tax_sample %>%
+  filter(str_detect(`Phylum`, "Myxococcota")) %>% 
+  count(Site, sort = TRUE))
+```
+
+```{r}
+combined_df %>% 
+  left_join(NEON_MAGs, by = c("siteID" = "Site ID")) %>% 
+  filter(str_detect(`Phylum`, "Myxococcota")) %>%
+  ggplot(aes(x = `Ecosystem Subtype`, y = `soilTemp`)) +
+  geom_point(aes(color=Order))
+```
+
+```{r}
+combined_df %>% 
+  left_join(NEON_MAGs, by = c("siteID" = "Site ID")) %>% 
+  filter(str_detect(`Phylum`, "Myxococcota")) %>%
+   ggplot(aes(x = `siteID`, y = `elevation`)) +
+  geom_point(aes(color=siteID))
+```
+
+```{r}
+combined_df %>% 
+  left_join(NEON_MAGs, by = c("siteID" = "Site ID")) %>% 
+  filter(str_detect(`Phylum`, "Myxococcota")) %>%
+   ggplot(aes(x = `siteID`, y = `soilTemp`)) +
+  geom_point(aes(color=siteID))
+```
+
+```{r}
+combined_df %>% 
+  left_join(NEON_MAGs, by = c("siteID" = "Site ID")) %>% 
+  filter(str_detect(`Phylum`, "Myxococcota")) %>%
+   ggplot(aes(x = `siteID`, y = `soilInCaClpH`)) +
+  geom_point(aes(color=siteID))
+```
+
+```{r}
+combined_df %>% 
+  left_join(NEON_MAGs, by = c("siteID" = "Site ID")) %>% 
+  filter(str_detect(`Phylum`, "Myxococcota")) %>%
+   ggplot(aes(x = `soilTemp`, y = `elevation`)) +
+  geom_point(aes(color=siteID)) +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+```{r}
+combined_df %>% 
+  left_join(NEON_MAGs, by = c("siteID" = "Site ID")) %>% 
+  filter(str_detect(`Phylum`, "Myxococcota")) %>%
+   ggplot(aes(x = `soilInCaClpH`, y = `elevation`)) +
+  geom_point(aes(color=siteID)) +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+```{r}
+combined_df %>% 
+  left_join(NEON_MAGs, by = c("siteID" = "Site ID")) %>% 
+  filter(str_detect(`Phylum`, "Myxococcota")) %>%
+   ggplot(aes(x = `soilInCaClpH`, y = `soilTemp`)) +
+  geom_point(aes(color=siteID)) +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+### BONA
+
+```{r}
+kable(
+  Site_MAGS <- NEON_MAGs %>% 
+  filter(str_detect(`Site`, 'Caribou Creek')))
+```
+
+```{r}
+Site_MAGS %>% 
+ggplot(aes(x = fct_infreq(Phylum))) +
+  geom_bar(aes(fill=Phylum)) +
+  coord_flip()
+```
+
+```{r}
+datatable(NEON_MAGs_Ind_tax %>% 
+filter(str_detect(`Genome Name`, 'Caribou Creek')) %>% 
+    count(Phylum, sort = TRUE))
+```
+
+```{r}
+NEON_MAGs_bact_ind %>%
+  filter(str_detect(`Site`, 'Caribou Creek')) %>% 
+ggplot(aes(x = (`Bin Quality`))) +
+  labs(title = "Bacteria by Quality", x = "Quality", y = "Count") +
+  geom_bar(aes(fill=`Bin Quality`)) +
+  coord_flip()
+```
+
+```{r}
+combined_df %>% 
+  left_join(NEON_MAGs, by = c("siteID" = "Site ID")) %>% 
+   ggplot(aes(x = `siteID`, y = `soilTemp`)) +
+  geom_point(aes(color=siteID))
+```
+
+```{r}
+combined_df %>% 
+  left_join(NEON_MAGs, by = c("siteID" = "Site ID")) %>% 
+   ggplot(aes(x = `siteID`, y = `soilInCaClpH`)) +
+  geom_point(aes(color=siteID))
+```
+
+```{r}
+combined_df %>% 
+  left_join(NEON_MAGs, by = c("siteID" = "Site ID")) %>% 
+   ggplot(aes(x = `siteID`, y = `elevation`)) +
+  geom_point(aes(color=siteID))
+```
+
+# References
