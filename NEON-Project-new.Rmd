@@ -4,10 +4,11 @@ author: "Kay Denmead, Leila Imani, Ethan Ni"
 date: "2024-05-17"
 output:
   html_document:
-    toc: TRUE
+    toc: true
     code_folding: hide
+  pdf_document:
+    toc: true
 bibliography: Myxo.final.bib
-
 ---
 
 # Abstract
