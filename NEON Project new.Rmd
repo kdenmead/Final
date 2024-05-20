@@ -6,19 +6,37 @@ output:
   html_document:
     toc: TRUE
     code_folding: hide
-bibliography: myxo_ref.bib
+bibliography: Myxo.final.bib
 
 ---
 
+# Abstract
+
+	Human activity facilitated climate change on Earth is a pressing concern that has led scientists to look deeper to determine how this impacts ecosystems. The National Ecological Observation Network (NEON) is a method of looking deeper, which has provided a variety of useful ecological data at NEON sites. The focus of this examination was the utilization of this data to determine information about the Phylum Myxococcota and the Caribou Creek Watershed (BONA) NEON site in Alaska.
+
+	Using data sorting and visualization with R on metagenomic data gathered from NEON sites, it was determined that Myxococcota are not found at Caribou Creek Watershed, possibly due to preferences for less acidic soil. The highest concentration of Myxococcota was found at Toolik Field Station and Chase Lake Wetlands, which appear to have a less harsh environment that Myxococcota may be more well-suited for.
+
+	These findings show the importance of soil pH, temperature, and other factors for the suitability of bacterial life, as well as reveal more specific knowledge about the ecological preferences of Myxococcota. The visualization of data and usage of R for interpreting large amounts of data is immeasurably valuable, and future research and usage of these R techniques can be used to monitor ecological sites in ecological upheaval due to climate change.
+
 # Introduction
-Humanity’s presence has had and will continue to have a profound impact on the Earth and the ecological processes that define it. Human emissions of greenhouse gasses are drastically impacting habitats around the globe, disrupting ecosystems and threatening biodiversity. Because of the incredible magnitude of change we are putting on the earth, it is important that we fully understand the effects of anthropogenic change on our ecosystems. Building this understanding is the first step towards taking action to protect the life around us. The National Ecological Observatory Network (NEON) program is an NSF-funded project that aims to quantify the changing ecological processes across the United States. NEON provides open data that characterize plants, animals, soil, nutrients, freshwater, and the atmosphere.
 
-Caribou Creek Watershed is a NEON field site located in central Alaska, northeast of Fairbanks. The site contains a variety of ecosystems, including shrublands, wetlands, hardwood forests, and scattered permafrost. Alaska as a whole is very affected by climate change, experiencing a temperature increase of 2.5 degrees C since 1948. The soils at this site are affected by a cycle of ice thawing and freezing. This results in a phenomenon called cryoturbation, which is when soil gets mixed by freezing and thawing ground ice.
+  Humanity’s presence has had and will continue to have a profound impact on the Earth and the ecological processes that define it. Human emissions of greenhouse gasses are drastically impacting habitats around the globe, disrupting ecosystems and threatening biodiversity. Because of the incredible magnitude of change we are putting on the earth, it is important that we fully understand the effects of anthropogenic change on our ecosystems. Building this understanding is the first step towards taking action to protect the life around us. The National Ecological Observatory Network (NEON) program is an NSF-funded project that aims to quantify the changing ecological processes across the United States. NEON provides open data that characterize plants, animals, soil, nutrients, freshwater, and the atmosphere.[@noauthor_overview_nodate]
 
-Myxococcta is a bacterial phylum which is notable for its "social lifestyle", a trait that is unusual in prokaryotes. These bacteria can thrive in many different environments including soil rich in organic matter, rotting wood, animal dung, and marine environments [@saggu_myxobacteria_2023]They have gliding motility and predatory behavior. They hunt in packs, using their gliding motility to swarm prey cells, feeding by secreting lytic enzymes [@waite_proposal_2020]. A recent study found that Myxococcota contains a photosynthesis gene cluster that encodes the enzymes necessary for bacteriochlorophyll biosynthesis, among other crucial enzymes. Phylogenetic analyses have indicated that this phylum has an ancient phototrophic history, playing a uniquely important role in ecosystems [@li_globally_2023]. They measure between 50-500 µm and can be seen with the naked eye [@shimkets_myxobacteria_2006]
+  Caribou Creek Watershed is a NEON field site located in central Alaska, northeast of Fairbanks. The site contains a variety of ecosystems, including shrublands, wetlands, hardwood forests, and scattered permafrost. Alaska as a whole is very affected by climate change, experiencing a temperature increase of 2.5 degrees C since 1948. The soils at this site are affected by a cycle of ice thawing and freezing. This results in a phenomenon called cryoturbation, which is when soil gets mixed by freezing and thawing ground ice. [@driscoll_science_2012][@noauthor_overview_nodate]
 
-Despite being known for more than 100 years, myxobacteria have only been closely studied for the last few decades because they produce unique bioactive secondary metabolites. For this reason, these bacteria are being considered as an important source of natural products for drug discovery. For example, epothilones, isolated from Sorangium sp., are anti-tumor drugs that target microtubules and can be effective against taxol-resistant cancers [@mulzer_epothilones_2008]. Further exploring the diversity of this phylum can contribute to future research with biotechnology applications. 
+  Myxococcta is a bacterial phylum which is notable for its "social lifestyle", a trait that is unusual in prokaryotes. These bacteria can thrive in many different environments including soil rich in organic matter, rotting wood, animal dung, and marine environments [@saggu_myxobacteria_2023]They have gliding motility and predatory behavior. They hunt in packs, using their gliding motility to swarm prey cells, feeding by secreting lytic enzymes [@waite_proposal_2020]. A recent study found that Myxococcota contains a photosynthesis gene cluster that encodes the enzymes necessary for bacteriochlorophyll biosynthesis, among other crucial enzymes. Phylogenetic analyses have indicated that this phylum has an ancient phototrophic history, playing a uniquely important role in ecosystems [@li_globally_2023]. They measure between 50-500 µm and can be seen with the naked eye [@shimkets_myxobacteria_2006]
 
+  Despite being known for more than 100 years, myxobacteria have only been closely studied for the last few decades because they produce unique bioactive secondary metabolites. For this reason, these bacteria are being considered as an important source of natural products for drug discovery. For example, epothilones, isolated from Sorangium sp., are anti-tumor drugs that target microtubules and can be effective against taxol-resistant cancers [@mulzer_epothilones_2008]. Further exploring the diversity of this phylum can contribute to future research with biotechnology applications. 
+
+# Methods
+
+  In constructing figures and comparing them, a more cohesive and comprehensive analysis of these variable relationships and how NEON site ecological makeup and bacterial preferences interplay created a varied and complex relationship within the dataset. As for the protocol used to obtain data at the NEON sites, soil samples are collected from 47 sites across the country each year. When collected, several types of data are collected, including measuring soil type, temperature, habitat type, etc. Using several different R packages, this data was sorted and visualized to determine the answers to several questions related to the Myxococcota phylum and the Caribou Creek NEON site. 
+  
+  In regards to Myxococcota, different R packages, data visualization, and sorting were utilized to determine the properties of Myxococcota when compared to other Phyla - particularly abundance, presences at NEON sites and ecosystem subtypes, preferences in soil pH, elevation, soil temperature, and relationships between those variables.
+  
+  The NEON site in question, Caribou Creek, is an Alaskan site. In the use of different R packages, data visualization, and sorting methods, the relationship between the number and abundance of Phyla at the site, sample quality, soil pH, elevation, soil temperature, and how these variables compare to the other NEON sites in the available data set were examined. 
+
+# Results
 
 ## Loading Libraries
 
@@ -47,6 +65,8 @@ library(ggnewscale)
 library(ggtreeExtra)
 library(ggtree)
 ```
+
+## Tree Information
 
 ```{r}
 tree_arc <- read.tree("data/NEON/gtdbtk.ar53.decorated.tree")
@@ -342,5 +362,35 @@ combined_df %>%
 ```{r}
 knitr::include_url("BONASankey.html")
 ```
+# Discussion
+
+## General Information
+
+  In our process of data analysis, we aimed to gather some general information about the species present within the NEON data. Notably, we discovered that the species in question is the seventh most abundant among all the species recorded in the dataset. This ranking indicates a small presence, suggesting that the species is relatively restricted and occurs in small numbers in certain habitats. Furthermore, our specific study site ranked seventh in terms of the total counts of species. This abundance of species across different sites provides a valuable context for understanding the ecological preferences and potential environmental factors influencing the distribution of species.
+
+## Myxococcota
+
+  When examining the presence of Myxococcota, we observed that this species is generally not abundant across the NEON sites. Notably, Myxococcota is absent at Caribou Creek. Instead, the highest occurrences of Myxococcota are found at Toolik Field Station and Chase Lake Wetlands. Analyzing these patterns reveals some interesting ecological insights. The absence of Myxococcota at Caribou Creek could be attributed to several environmental factors, with soil pH being a significant one. Caribou Creek's soil is notably more acidic compared to other sites, with a pH around 4. This high acidity level is likely inhospitable to Myxococcota, which may prefer neutral to slightly acidic soil conditions.
+
+  Additionally, the preferred habitats of Myxococcota, such as grasslands and temperate forests, suggest that soil temperature and vegetation type might also play critical roles in their distribution. Both Toolik Field Station and Chase Lake Wetlands provide conditions that align more closely with these preferences, potentially explaining the higher abundance of Myxococcota in these areas. This pattern highlights the species' ecological niche and the specific environmental conditions that support its proliferation.
+  
+## Site Analysis: Caribou Creek (BONA)
+
+  Caribou Creek, located at an elevation between approximately 400 to 550 feet, presents a unique set of environmental conditions that distinguish it from other NEON sites. One of the most notable characteristics of Caribou Creek is its highly acidic soil, with a pH of around 4. This level of acidity is among the highest observed across the NEON network, potentially influencing the types of species that can thrive there.
+  
+  Analyzing the patterns seen in the figures of species distribution across different NEON sites, it becomes evident that Caribou Creek's unique soil chemistry creates a distinct ecological environment. The absence of Myxococcota, a species that prefers less acidic conditions, underscores the significant impact of soil pH on species distribution. Furthermore, the acidic soil might support species that are specifically adapted to such conditions, contributing to a unique community structure at Caribou Creek.
+  
+  In summary, the patterns observed in the NEON data highlight the intricate relationship between environmental factors and species distribution. Caribou Creek's acidic soil presents a challenging environment for species like Myxococcota, while other sites with more neutral pH levels and suitable habitat conditions, such as Toolik Field Station and Chase Lake Wetlands, support their abundance. These findings underscore the importance of considering multiple environmental variables when studying species distribution and ecological dynamics.
+
+## Conclusion
+
+  Through our analysis of the Myxococcota species at our site, Caribou Creek, we have gained valuable insights into both the species itself and the process of data analysis in R.
+
+  Regarding the species, we have identified whether the Myxococcota taxa is present at Caribou Creek, providing a comprehensive understanding of their distribution and abundance in the ecosystem. We have also explored their ecological characteristics such as their preferred habitat and temperature.
+  
+  In terms of data analysis in R, we have learned several key methods and techniques. We started by importing and filtering our data, ensuring that it was formatted correctly for analysis. We then conducted visualizations of the data to explore the distribution of and the patterns of the Myxococcota taxa at the site.
+  
+  Overall, our analysis has provided a deeper understanding of the Myxcoccota species at Caribou Creek and has demonstrated the power of R as a tool for data analysis in ecological studies. Knowing the current state of Myxcococcota can now give us information about climate change when more data is collected and compared to old data.
+
 
 # References
